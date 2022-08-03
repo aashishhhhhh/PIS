@@ -43,7 +43,7 @@
                   
               @endforeach
               <p>मर्मत आवेदन फारम न: {{nepali($item->marmat_form_no)}} </p>
-              <input type="hidden" name="fiscal_year" value="">
+              <input type="hidden" name="fiscal_year" value="{{$fiscal_year}}">
 
                 @php
                 $id = array();

@@ -11,9 +11,12 @@ class StaffTaskAssign extends Model
     protected $connection = 'mysql_pis';
     protected $table = 'staff_task_assign';
 
+
+
     protected $fillable = [
         'staff_task_id',
-        'staff_id'
+        'staff_id',
+        'staff_task_status'
     ];
 
     public function staffs()

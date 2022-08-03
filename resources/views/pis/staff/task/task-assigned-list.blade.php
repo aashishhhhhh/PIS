@@ -36,12 +36,19 @@
             <tbody>
                 
             @foreach ($tasked->stafftasks as $key => $item)
+            {{-- @dd() --}}
+            {{-- @dd($tasked) --}}
+            {{-- @dd() --}}
                 <tr>
                 <td>{{nepali($key+1)}}</td>
                 <td>{{$item->nep_name}}</td>
                 <td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">
                     कार्य विवरण हेर्नुहोस
-                  </button></td>
+                  </button>
+                  <a  href="{{route('view-task-description',$item->pivot->id)}}" class="btn btn-success">
+                    कार्य विवरण हेर्नुहोस
+                  </a>
+                </td>
                 @if ($tasked->deadline_type==1)
                 <td>{{$tasked->start_date}}</td>
                 <td>{{$tasked->finish_date}}</td>
@@ -49,13 +56,41 @@
                 <td>{{$tasked->start_time}}</td>
                 <td>{{$tasked->finish_time}}</td>
                 @endif
-                <td></td>
+                <td>
+                  
+                  @hasanyrole('admin|user')
+                  <button type="button" class="btn btn-success" data-toggle="modal" data-target="#status{{$item->pivot->id}}">
+                    स्थिति
+                </button>
+                @endrole
+                  
+                @hasanyrole('cao')
+                  
+                @if($item->pivot->staff_task_status==1)
+                टास्क प्राप्त गरेको
+                @endif
+
+                @if($item->pivot->staff_task_status==2)
+                विवरण तयार गर्दै गरेको
+                @endif
+
+                @if($item->pivot->staff_task_status==3)
+                टिप्पणी/प्रतिवेदन/पत्र तयार तयार गर्दै गरेको
+                @endif
+
+                @if($item->pivot->staff_task_status==4)
+                काम सम्पन्न गरेको
+                @endif
+              @if ($item->pivot->staff_task_status==0)
+                  कम सुरु गर्न वाकी
+              @endif
+                
+                @endrole
+              </td></td>
                 <td><a href="{{route('assigned-task-comments',$item->pivot->id)}}" class="btn btn-primary"><i class="fas fa-comment-alt-medical"></i>टिप्पणीहरु</a></td>
                 </tr>
 
                 <!-- Button trigger modal -->
-
-  
   <!-- Modal -->
   <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -75,9 +110,58 @@
       </div>
     </div>
   </div>
+  <div class="modal fade" id="status{{$item->pivot->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">स्थिति</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form action="{{route('submit-task-status')}}" method="POST">
+          @csrf
+        <div class="modal-body" >
+          {{-- @dd() --}}
 
+          
+          <div class="form-check">
+            <input type="hidden" name="task_id" value="{{$item->pivot->id}}">
+            <input class="form-check-input" type="radio" name="task_status" id="flexRadioDefault1" value="1" @if($item->pivot->staff_task_status==1) checked @endif>
+            <label class="form-check-label" for="flexRadioDefault1">
+            टास्क प्राप्त गरेको
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="task_status" id="flexRadioDefault2" value="2" @if($item->pivot->staff_task_status==2) checked @endif>
+            <label class="form-check-label" for="flexRadioDefault2">
+              विवरण तयार गर्दै गरेको
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="task_status" id="flexRadioDefault3" value="3" @if($item->pivot->staff_task_status==3) checked @endif>
+            <label class="form-check-label" for="flexRadioDefault3">
+              टिप्पणी/प्रतिवेदन/पत्र तयार तयार गर्दै गरेको
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="task_status" id="flexRadioDefault4" value="4" @if($item->pivot->staff_task_status==4) checked @endif>
+            <label class="form-check-label" for="flexRadioDefault4">
+              काम सम्पन्न गरेको
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+
+      </div>
+    </div>
+  </div>
             @endforeach
-
             </tbody>
             </table>
     </div>

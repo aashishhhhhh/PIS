@@ -12,6 +12,8 @@ use App\Models\PisModel\StaffTaskComments;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
+use function GuzzleHttp\Promise\all;
+
 class TaskController extends Controller
 {
 
@@ -227,10 +229,24 @@ class TaskController extends Controller
                 'staff_id' => $receiver_staff_id
             ]);
         }
-
-
-
         return redirect()->back();
+    }
+
+    public function view_task_description(StaffTaskAssign $task)
+    {
+        $task = $task->load('tasks');
+        return view('pis.staff.task.task-description', [
+            'task' => $task
+        ]);
+    }
+
+    public function submit_task_status(Request $request)
+    {
+        $task = StaffTaskAssign::query()->where('id', $request->task_id)->first();
+        $task->update([
+            'staff_task_status' => $request->task_status
+        ]);
+        return redirect()->back()->with('msg', 'कार्य स्थिति सम्पादन भएको छ');
     }
 
 

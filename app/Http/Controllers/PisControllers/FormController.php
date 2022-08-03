@@ -387,9 +387,59 @@ class FormController extends Controller
         );
     }
 
-    public function update_maag_form()
+    public function update_maag_form(Request $request)
     {
-        dd('hello');
+        // dd($request->all());
+        $request->validate([
+            'fiscal_year.*' => 'required',
+            'saman_name.*' => 'required',
+            'specification.*' => 'required',
+            'unit.*' => 'required',
+            'quantity.*' => 'required',
+            'remarks.*' => 'required'
+        ]);
+
+        $staff = Staff::query()->where('id', $request->staff_id)->first();
+        $maag_no = StaffMaag::query()->where('maag_no', $request->maag_no)->get();
+
+        foreach ($maag_no as $key => $value) {
+            $value->delete();
+        }
+        foreach ($request->fiscal_year as $key => $value) {
+            $id[$key] = StaffMaag::create([
+                'staff_id' => $request->staff_id,
+                'fiscal_year' => $request->fiscal_year[$key],
+                'saman_name' => $request->saman_name[$key],
+                'specification' => $request->specification[$key],
+                'unit' => $request->unit[$key],
+                'quantity' => $request->quantity[$key],
+                'remarks' => $request->remarks[$key],
+                'maag_no' => $request->maag_no,
+                'kharid_type' => $request->radio
+            ]);
+        }
+
+        $latest = array();
+        foreach ($id as $key => $value) {
+            $latest[$key] = StaffMaag::query()->where('id', $value->id)->with('saman')->first();
+        }
+        $request->session()->put('latest', $latest);
+
+        Notification::create([
+            'text' => $staff->nep_name . 'को नया माग फारम एडिट भएकोछ',
+            'is_read' => 0,
+            'role_id' => config('pis_constant.ADMIN_ID'),
+        ]);
+
+        Notification::create([
+            'text' => 'तपाइको आवेदन एडिट भएको छ',
+            'is_read' => 0,
+            'role_id' => config('pis_constant.USER_ID'),
+            'staff_id' => $staff->id,
+            'noti_type' => 'forms'
+        ]);
+
+        return redirect()->back()->with('msg', 'माग फारम आवेदन भएको छ');
     }
 
     public function marmat_aadesh_form()
@@ -602,6 +652,7 @@ class FormController extends Controller
         $staff_all = Staff::all();
         $staff_Services = StaffService::query()->where('user_id', auth()->user()->id)->first();
         $services = StaffService::all();
+        $fiscal_year = getCurrentFiscalYear();
         return view(
             'pis.staff.forms.view_marmat_aadesh_form',
             [
@@ -611,7 +662,8 @@ class FormController extends Controller
                 'staff_all' => $staff_all,
                 'staff_Services' => $staff_Services,
                 'services' => $services,
-                'marmatstorekeeper' => $marmatstorekeeper
+                'marmatstorekeeper' => $marmatstorekeeper,
+                'fiscal_year' => $fiscal_year
             ]
         );
     }
@@ -675,6 +727,94 @@ class FormController extends Controller
             'marmat_form_no' => $request->marmat_no
         ]);
         return redirect()->route('marmat-form-list');
+    }
+
+    public function edit_marmat_form(StaffMarmatno $marmatno)
+    {
+        $marmat = $marmatno->load('marmats');
+        $fiscal_year = FiscalYear::query()->where('is_current', 1)->first();
+        $staff = Staff::query()->where('id', $marmat->staff_id)->first();
+        return view(
+            'pis.staff.forms.edit_marmat_aadesh_form',
+            [
+                'fiscal_year' => $fiscal_year,
+                'staff' => $staff,
+                'marmat' => $marmat
+            ]
+        );
+    }
+
+    public function update_marmat_form(Request $request)
+    {
+        $request->validate([
+            'saman_bibaran.*' => 'required',
+            'saman_pahichan_no.*' => 'required',
+            'anumati_mamrmat_lagat.*' => 'required',
+            'reason.*' => 'required',
+            'applicant_name.*' => 'required',
+            'remarks.*' => 'required',
+        ]);
+
+        $marmat = StaffMarmatno::all();
+        $staff = Staff::query()->where('id', $request->staff_id)->first();
+
+        $previousMarmat = StaffMarmat::query()->where('marmat_form_no', $request->marmat_form_no)->get();
+
+        foreach ($previousMarmat as $key => $value) {
+            $value->delete();
+        }
+
+        foreach ($request->saman_bibaran as $key => $value) {
+            $id[$key] =  StaffMarmat::create([
+                'saman_bibaran' => $request->saman_bibaran[$key],
+                'anumati_marmat_lagat' => $request->anumati_mamrmat_lagat[$key],
+                'saman_pahichan_no' => $request->saman_pahichan_no[$key],
+                'reason' => $request->reason[$key],
+                'applicant_name' => $request->applicant_name[$key],
+                'remarks' => $request->remarks[$key],
+                'marmat_form_no' => $request->marmat_form_no,
+                'staff_id' => $staff->id
+            ]);
+        }
+
+        Notification::create([
+            'text' => $staff->nep_name . 'को नया मर्मत आदेस एडिट भएकोछ',
+            'is_read' => 0,
+            'role_id' => config('pis_constant.ADMIN_ID'),
+        ]);
+
+        Notification::create([
+            'text' => 'तपाइको मर्मत आवेदन एडिट भएको छ',
+            'is_read' => 0,
+            'role_id' => config('pis_constant.USER_ID'),
+            'staff_id' => $staff->id,
+            'noti_type' => 'forms'
+        ]);
+        $latest = array();
+        foreach ($id as $key => $value) {
+            $latest[$key] = StaffMarmat::query()->where('id', $value->id)->first();
+        }
+
+        $staff = Staff::query()->where('id', $request->staff_id)->first();
+        $staffAddress = StaffAddress::query()->where('user_id', auth()->user()->id)->with('municipalities')->first();
+        $staff_all = Staff::all();
+        $staff_Services = StaffService::query()->where('user_id', auth()->user()->id)->first();
+        $services = StaffService::all();
+
+        // return view(
+        //     'pis.staff.forms.view_marmat_aadesh_form',
+        //     [
+        //         'latest' => $latest,
+        //         'staff' => $staff,
+        //         'staff_address' => $staffAddress,
+        //         'staff_all' => $staff_all,
+        //         'staff_Services' => $staff_Services,
+        //         'services' => $services
+        //     ]
+        // );
+
+
+        return redirect()->back()->with('msg', 'Data updated successfully');
     }
 
     public function verify_marmat_details(StaffMarmatno $marmat)

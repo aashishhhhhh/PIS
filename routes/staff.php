@@ -147,8 +147,8 @@ Route::prefix('staff')->group(function () {
     Route::get('fill-marmat-details/{marmatno}', [FormController::class, 'fill_marmat_details'])->name('fill-marmat-details');
     Route::get('marmat-storekeeper-form/{marmatno}', [FormController::class, 'marmat_storekeeper_form'])->name('marmat-storekeeper-form');
     Route::post('marmat-storekeeper-form-submit', [FormController::class, 'marmat_storekeeper_form_submit'])->name('marmat-storekeeper-form-submit');
-
-
+    Route::get('edit-marmat-form/{marmatno}', [FormController::class, 'edit_marmat_form'])->name('edit-marmat-form');
+    Route::post('update-marmat-form', [FormController::class, 'update_marmat_form'])->name('update-marmat-form');
 
     Route::get('bhraman-pratiwedan-form/{visit}', [FormController::class, 'bhraman_pratiwedan_form'])->name('bhraman-pratiwedan-form');
     Route::post('bhraman-pratiwedan-form_submit', [FormController::class, 'bhraman_pratiwedan_form_submit'])->name('bhraman_pratiwedan_form_submit');
@@ -242,6 +242,8 @@ Route::prefix('staff')->group(function () {
     Route::get('task-list', [TaskController::class, 'task_list'])->name('task-list');
     Route::get('assigned-task-comment/{tasks}', [TaskController::class, 'assigned_task_comment'])->name('assigned-task-comments');
     Route::post('assigned-task-comments', [TaskController::class, 'assigned_task_comment_submit'])->name('assigned-task-comment');
+    Route::post('submit-task-status', [TaskController::class, 'submit_task_status'])->name('submit-task-status');
+    Route::get('view-task-description/{task}', [TaskController::class, 'view_task_description'])->name('view-task-description');
     Route::get('test', [TaskController::class, 'test'])->name('test.test');
 
 

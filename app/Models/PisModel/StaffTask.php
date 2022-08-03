@@ -29,6 +29,6 @@ class StaffTask extends Model
 
     public function stafftasks()
     {
-        return $this->belongsToMany(Staff::class, 'staff_task_assign', 'staff_task_id', 'staff_id')->withPivot('id', 'staff_id');
+        return $this->belongsToMany(Staff::class, 'staff_task_assign', 'staff_task_id', 'staff_id')->withPivot('id', 'staff_id', 'staff_task_status');
     }
 }

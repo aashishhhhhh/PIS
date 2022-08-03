@@ -1311,6 +1311,7 @@ class StaffController extends Controller
         if (Auth::user()->hasRole('admin')) {
             $role = 'admin';
         } elseif (Auth::user()->hasRole('cao')) {
+            $applications = StaffLeaveApplication::query()->where('cao_approved', 0)->with('settingLeaves')->get();
             $role = 'cao';
         } elseif (Auth::user()->hasRole('user')) {
             $role = 'user';

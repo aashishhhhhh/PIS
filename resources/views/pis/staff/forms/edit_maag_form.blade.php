@@ -136,9 +136,9 @@
                             </tr>
 
                             @foreach ($maag->maags as $item)
-                                
                             @endforeach
-                           
+                            <input type="hidden" name="staff_id" value="{{$item->staff_id}}">
+                            <input type="hidden" name="maag_no" value="{{$item->maag_no}}">
                             </thead>
                             @foreach ($maag->maags as $value)
                             @foreach ($saman as $item)

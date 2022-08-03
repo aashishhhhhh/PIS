@@ -28,6 +28,7 @@
                             <th>मिति</th>
                             <th>स्थिति</th>
                             <th>विवरणहेर्नुहोस</th>
+                            <th>#</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -80,6 +81,9 @@
                                     @endif
 
                                     @hasanyrole('admin')
+                                    @if ($item->marmatStoreKeeper==null)
+                                    <a href="{{route('marmat-storekeeper-form',$item->id)}}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="फातवाला/स्तोरेकिपरले भर्ने"><i class="fas fa-file"></i></a>
+                                    @endif
                                     @if ($item->is_verified==0 || $item->is_verified==2)
                                         @if ($item->marmatStoreKeeper==null)
                                             <a href="{{route('marmat-storekeeper-form',$item->id)}}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="फातवाला/स्तोरेकिपरले भर्ने"><i class="fas fa-file"></i></a>
@@ -88,17 +92,27 @@
                                     @else
                                         <a href="{{route('decline-marmat-details', $item->id)}}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title=" रद्ध गर्नुहोस"><i class="fa-solid fa-thumbs-down"></i>रद्ध गर्नुहोस</a>
                                     @endif
+
                                     @endhasanyrole
 
                                     @hasrole('cao')
                                     @if ($item->is_approved==0 || $item->is_approved==2)
                                     <a href="{{route('approve-marmat-details',$item->id)}}" class="btn btn-primary" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="स्वीकृत गर्नुहोस"><i class="fas fa-thumbs-up"></i> स्वीकृत गर्नुहोस</a>
                                     @else
+                                    
                                     <a href="{{route('disapprove-marmat-details',$item->id)}}" class="btn btn-primary" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="रद्ध गर्नुहोस"><i class="fas fa-thumbs-down"></i> रद्ध गर्ने</a>
                                     @endif
                                     @endrole
+
+                                   
+                                </td>
+                                <td>
+                                    @if($item->is_approved!=1 || $item->is_verified!=1)
+                                    <a href="{{route('edit-marmat-form',$item->id)}}"><i class="fas fa-edit"></i></a>
+                                    @endif
                                 </td>
                             </tr>
+                            
                         @endforeach
                     </tbody>
                 </table>

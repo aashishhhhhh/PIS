@@ -112,7 +112,9 @@
                                 
                                 </td>
                                 <td>
+                                    @if($item->is_approved!=1 || $item->is_verified!=1)
                                     <a href="{{route('edit-maag-form',$item->id)}}"><i class="fas fa-edit"></i></a>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
